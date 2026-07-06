@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>من سيربح التاج؟ – أكاديمية ترتيلا</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap');
+
+        :root {
+            --royal-blue: #1e3a8a;
+            --royal-gold: #fbbf24;
+            --royal-gold-dark: #b45309;
+            --royal-turq: #06b6d4;
+            --marble-white: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--royal-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            color: var(--marble-white);
+        }
+
+        /* Palace Background */
+        #app-container {
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            max-height: 950px;
+            position: relative;
+            background: radial-gradient(circle at top, #1e40af 0%, #0f172a 100%);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Animated Stars Background */
+        .stars-bg { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 5px var(--royal-gold); } }
+
+        /* Palace Pillars */
+        .pillar {
+            position: absolute; top: 0; width: 40px; height: 100%; z-index: 2;
+            background: linear-gradient(90deg, #d4d4d8 0%, #f4f4f5 50%, #a1a1aa 100%);
+            border-left: 2px solid #fbbf24; border-right: 2px solid #fbbf24;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        .pillar-left { left: 10px; }
+        .pillar-right { right: 10px; }
+        .pillar-top { position: absolute; top: 0; left: -10px; width: 60px; height: 30px; background: linear-gradient(45deg, #fbbf24, #f59e0b); border-radius: 5px; box-shadow: 0 5px 10px rgba(0,0,0,0.4); }
+        .pillar-bottom { position: absolute; bottom: 0; left: -10px; width: 60px; height: 40px; background: linear-gradient(45deg, #fbbf24, #f59e0b); border-radius: 5px 5px 0 0; }
+
+        /* Screens */
+        .screen { display: none; flex-direction: column; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 10; padding: 20px; }
+        .screen.active { display: flex; animation: zoomIn 0.5s ease-out; }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* UI Elements */
+        .title-gold {
+            background: linear-gradient(to bottom, #fde047, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8));
+        }
+
+        .btn-royal {
+            background: linear-gradient(135deg, var(--royal-gold), #d97706);
+            color: #451a03; border: 2px solid #fef08a; padding: 15px 30px;
+            border-radius: 30px; font-size: 1.3rem; font-weight: 900;
+            cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: all 0.2s; text-align: center; width: 85%; max-width: 350px; margin: 10px auto;
+            position: relative; overflow: hidden;
+        }
+        .btn-royal:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 25px rgba(251, 191, 36, 0.4); }
+        .btn-royal:active { transform: translateY(1px); }
+        
+        .btn-blue { background: linear-gradient(135deg, var(--royal-turq), #0284c7); color: white; border-color: var(--royal-turq); }
+
+        .input-field {
+            width: 85%; max-width: 350px; padding: 15px; margin: 15px auto;
+            border-radius: 20px; border: 3px solid var(--royal-gold);
+            background: rgba(255,255,255,0.9); color: var(--royal-blue);
+            font-size: 1.3rem; text-align: center; font-weight: bold;
+            outline: none; box-shadow: inset 0 3px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Game HUD */
+        .hud {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(15, 23, 42, 0.8); border: 2px solid var(--royal-gold);
+            border-radius: 15px; padding: 10px 15px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 20;
+        }
+        .hud-item { display: flex; flex-direction: column; align-items: center; font-weight: bold; font-size: 0.9rem; color: #cbd5e1; }
+        .hud-val { font-size: 1.2rem; color: var(--royal-gold); text-shadow: 1px 1px 2px black; font-weight: 900; }
+
+        /* Progress Bar */
+        .progress-wrapper { background: rgba(0,0,0,0.5); border-radius: 20px; height: 15px; width: 100%; border: 1px solid var(--royal-gold); overflow: hidden; position: relative; margin-bottom: 20px; }
+        .progress-fill { background: linear-gradient(90deg, #f59e0b, #fde047); height: 100%; width: 0%; transition: width 0.5s ease-out; }
+        .progress-text { position: absolute; top: -2px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: bold; color: white; text-shadow: 1px 1px 1px black; }
+
+        /* Lifelines (وسائل المساعدة) */
+        .lifelines-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; z-index: 20; }
+        .lifeline-btn {
+            width: 55px; height: 55px; border-radius: 50%;
+            background: radial-gradient(circle, #38bdf8, #0284c7);
+            border: 3px solid var(--royal-gold);
+            color: white; font-size: 1.5rem; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: all 0.3s;
+        }
+        .lifeline-btn:hover { transform: scale(1.1); }
+        .lifeline-btn.used { background: #475569; border-color: #94a3b8; color: #94a3b8; pointer-events: none; transform: scale(0.9); }
+        .lifeline-tooltip { position: absolute; background: rgba(0,0,0,0.8); color: white; padding: 4px 8px; border-radius: 5px; font-size: 0.7rem; top: 60px; opacity: 0; pointer-events: none; transition: opacity 0.2s; white-space: nowrap; }
+        .lifeline-btn:hover .lifeline-tooltip { opacity: 1; }
+
+        /* Question Area */
+        .question-box {
+            background: linear-gradient(180deg, rgba(30,58,138,0.9), rgba(15,23,42,0.9));
+            border: 3px solid var(--royal-gold); border-radius: 20px; padding: 25px 15px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;
+            margin-bottom: 20px; position: relative;
+        }
+        .q-text { font-size: 1.4rem; font-weight: 900; color: white; line-height: 1.5; text-shadow: 1px 1px 3px black; }
+        
+        .options-grid { display: grid; gap: 12px; grid-template-columns: 1fr; z-index: 20; flex-grow: 1; }
+        .opt-btn {
+            background: linear-gradient(90deg, #0f172a, #1e3a8a);
+            border: 2px solid var(--royal-gold); padding: 15px;
+            border-radius: 15px; font-size: 1.2rem; font-weight: bold; color: white;
+            cursor: pointer; transition: all 0.2s; display: flex; align-items: center; text-align: right;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+        }
+        .opt-btn::before {
+            content: attr(data-letter); margin-left: 15px; color: var(--royal-gold); font-weight: 900; font-size: 1.3rem; text-shadow: 1px 1px 1px black;
+        }
+        .opt-btn:hover { background: linear-gradient(90deg, #1e40af, #3b82f6); transform: translateX(-5px); }
+        .opt-btn.correct { background: linear-gradient(90deg, #166534, #22c55e); border-color: #4ade80; animation: pulseGreen 1s infinite; }
+        .opt-btn.wrong { background: linear-gradient(90deg, #7f1d1d, #ef4444); border-color: #f87171; }
+        .opt-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+        @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(34,197,94, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(34,197,94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34,197,94, 0); } }
+
+        /* Timer */
+        .timer-circle {
+            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 60px; background: var(--royal-blue); border: 4px solid var(--royal-gold);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem; font-weight: 900; color: white; box-shadow: 0 0 15px var(--royal-gold);
+        }
+        .timer-circle.danger { color: #ef4444; border-color: #ef4444; box-shadow: 0 0 15px #ef4444; animation: shake 0.5s infinite; }
+        @keyframes shake { 0%, 100% { transform: translateX(-50%) rotate(0deg); } 25% { transform: translateX(-55%) rotate(-5deg); } 75% { transform: translateX(-45%) rotate(5deg); } }
+
+        /* Feedback Overlay */
+        .feedback-msg {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            background: rgba(255,255,255,0.95); padding: 20px 40px; border-radius: 20px;
+            border: 4px solid var(--royal-gold); font-size: 1.5rem; font-weight: 900;
+            color: var(--royal-blue); z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center;
+            width: 80%; max-width: 400px;
+        }
+        .feedback-msg.show { transform: translate(-50%, -50%) scale(1); }
+
+        /* Crown Animation on Win */
+        .falling-crown { position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 150px; z-index: 50; transition: top 2s cubic-bezier(0.25, 1, 0.5, 1); filter: drop-shadow(0 0 20px var(--royal-gold)); }
+        .falling-crown.fall { top: 20%; }
+
+        /* Tables & Lists */
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; margin-top: 10px; }
+        .data-table th { background: rgba(251, 191, 36, 0.2); color: var(--royal-gold); padding: 10px; border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.4); }
+        .data-table td { background: rgba(255,255,255,0.1); padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; color: white; }
+        .data-table tr td:first-child { border-radius: 0 8px 8px 0; border-left: none; }
+        .data-table tr td:last-child { border-radius: 8px 0 0 8px; border-right: none;}
+
+        .controls { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 60; }
+        .icon-btn { background: rgba(0,0,0,0.5); border: 2px solid var(--royal-gold); color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        
+        .scrollable { overflow-y: auto; padding-bottom: 30px; }
+        .scrollable::-webkit-scrollbar { width: 6px; }
+        .scrollable::-webkit-scrollbar-thumb { background: var(--royal-gold); border-radius: 3px; }
+        
+        .hidden { display: none !important; }
+        .confetti { position: absolute; pointer-events: none; z-index: 200; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <!-- Animated Background Elements -->
+        <div class="stars-bg" id="stars-container"></div>
+        <div class="pillar pillar-left"><div class="pillar-top"></div><div class="pillar-bottom"></div></div>
+        <div class="pillar pillar-right"><div class="pillar-top"></div><div class="pillar-bottom"></div></div>
+
+        <!-- Global Controls -->
+        <div class="controls">
+            <button class="icon-btn" id="btn-sound" onclick="toggleSound()">🔊</button>
+            <button class="icon-btn hidden" id="btn-home" onclick="showScreen('start')">🏠</button>
+        </div>
+
+        <!-- 1. Start Screen -->
+        <div id="screen-start" class="screen active" style="justify-content: center; align-items: center; z-index: 10;">
+            
+            <div style="text-align: center; margin-bottom: 20px; z-index: 20;">
+                <!-- Crown Logo SVG -->
+                <svg viewBox="0 0 100 80" width="120" style="margin: 0 auto; filter: drop-shadow(0 0 15px var(--royal-gold));">
+                    <path d="M10 60 L20 20 L40 40 L50 10 L60 40 L80 20 L90 60 Z" fill="#fbbf24" stroke="#d97706" stroke-width="2"/>
+                    <rect x="15" y="65" width="70" height="10" rx="3" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                    <circle cx="20" cy="15" r="5" fill="#38bdf8"/>
+                    <circle cx="50" cy="5" r="5" fill="#f87171"/>
+                    <circle cx="80" cy="15" r="5" fill="#38bdf8"/>
+                    <circle cx="50" cy="50" r="6" fill="white"/>
+                </svg>
+                <h3 class="text-xl font-bold mt-2 text-blue-200">أكاديمية ترتيلا تقدم</h3>
+                <h1 class="text-4xl md:text-5xl font-black mt-2 mb-2 title-gold">من سيربح التاج؟</h1>
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 30px 20px; border-radius: 25px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid var(--royal-gold); z-index: 20; backdrop-filter: blur(5px);">
+                <p class="text-lg font-bold mb-4" style="color: white; line-height: 1.6;">
+                    مرحبًا يا بطل القرآن 🌸<br>
+                    هل تستطيع الإجابة عن جميع الأسئلة والوصول إلى التاج الذهبي؟
+                </p>
+                <input type="text" id="player-name" class="input-field" placeholder="اكتب اسمك هنا..." maxlength="20">
+                <button class="btn-royal w-full mt-2" onclick="startGame()">👑 ابدأ التحدي</button>
+                <button class="btn-royal btn-blue w-full" onclick="showScreen('leaderboard'); renderLeaderboard();">🏆 لوحة الأبطال</button>
+                
+                <div class="mt-5 pt-3 border-t border-gray-600 text-sm font-bold text-gray-300">
+                    ✨ عمل معلمة بسنت احمد ✨
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Game Screen -->
+        <div id="screen-game" class="screen">
+            
+            <div class="hud mt-10">
+                <div class="hud-item">👦 <span id="hud-name" class="hud-val">البطل</span></div>
+                <div class="hud-item">🏆 <span id="hud-score" class="hud-val">0</span></div>
+                <div class="hud-item">⭐ <span id="hud-stars" class="hud-val">0</span></div>
+                <div class="hud-item">👑 <span id="hud-level" class="hud-val text-sm">مستوى 1</span></div>
+            </div>
+
+            <!-- Progress Ladder -->
+            <div class="progress-wrapper">
+                <div class="progress-fill" id="progress-bar"></div>
+                <div class="progress-text">السؤال <span id="q-current-num">1</span> من 20</div>
+            </div>
+
+            <!-- Lifelines -->
+            <div class="lifelines-container">
+                <div class="relative">
+                    <button class="lifeline-btn" id="ll-5050" onclick="useLifeline('5050')">💡<span class="lifeline-tooltip">حذف إجابتين</span></button>
+                </div>
+                <div class="relative">
+                    <button class="lifeline-btn" id="ll-time" onclick="useLifeline('time')">⏳<span class="lifeline-tooltip">إضافة 30 ثانية</span></button>
+                </div>
+                <div class="relative">
+                    <button class="lifeline-btn" id="ll-change" onclick="useLifeline('change')">🎁<span class="lifeline-tooltip">سؤال بديل</span></button>
+                </div>
+                <div class="relative">
+                    <button class="lifeline-btn" id="ll-skip" onclick="useLifeline('skip')">⭐<span class="lifeline-tooltip">تخطي السؤال</span></button>
+                </div>
+            </div>
+
+            <!-- Question Box -->
+            <div class="question-box">
+                <div class="timer-circle" id="timer-display">30</div>
+                <div id="q-text" class="q-text mt-4">جاري تحميل السؤال...</div>
+            </div>
+
+            <div class="options-grid" id="q-options">
+                <!-- Options injected via JS -->
+            </div>
+
+            <div id="feedback-overlay" class="feedback-msg">رسالة</div>
+        </div>
+
+        <!-- 3. Result Screen -->
+        <div id="screen-result" class="screen scrollable" style="justify-content: flex-start; align-items: center; padding-top: 50px;">
+            
+            <svg class="falling-crown" id="win-crown" viewBox="0 0 100 80">
+                <path d="M10 60 L20 20 L40 40 L50 10 L60 40 L80 20 L90 60 Z" fill="#fbbf24" stroke="#d97706" stroke-width="2"/>
+                <rect x="15" y="65" width="70" height="10" rx="3" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                <circle cx="20" cy="15" r="5" fill="#38bdf8"/><circle cx="50" cy="5" r="5" fill="#f87171"/><circle cx="80" cy="15" r="5" fill="#38bdf8"/>
+            </svg>
+
+            <div style="background: rgba(15,23,42,0.85); padding: 30px 20px; border-radius: 25px; width: 95%; max-width: 500px; text-align: center; border: 3px solid var(--royal-gold); margin-top: 60px; z-index: 20; backdrop-filter: blur(5px);">
+                
+                <h1 class="text-3xl font-black title-gold mb-2" id="res-title">مبارك يا بطل!</h1>
+                <p id="res-msg" class="text-lg font-bold text-white mb-4">لقد أجبت عن جميع الأسئلة بنجاح، وفزت بالتاج الذهبي.</p>
+                
+                <div class="text-center mb-4">
+                    <div class="text-4xl mb-2" id="res-badge-icon">👑</div>
+                    <div class="text-2xl font-black text-yellow-400" id="res-badge-title">بطل التاج الذهبي</div>
+                </div>
+
+                <table class="data-table">
+                    <tr><td>🏆 النقاط المكتسبة</td><td id="res-score" class="text-yellow-400 font-black text-xl">0</td></tr>
+                    <tr><td>⭐ النجوم</td><td id="res-stars">0</td></tr>
+                    <tr><td>✅ الإجابات الصحيحة</td><td id="res-correct" class="text-green-400">0</td></tr>
+                    <tr><td>❌ الإجابات الخاطئة</td><td id="res-wrong" class="text-red-400">0</td></tr>
+                    <tr><td>⏱️ الوقت المستغرق</td><td id="res-time">00:00</td></tr>
+                </table>
+
+                <div class="mt-6 flex flex-col gap-3">
+                    <button class="btn-royal w-full" style="margin: 0;" onclick="startGame()">🔄 العب مرة أخرى</button>
+                    <button class="btn-royal btn-blue w-full" style="margin: 0;" onclick="showScreen('leaderboard'); renderLeaderboard();">🏆 لوحة الأبطال</button>
+                    <button class="btn-royal w-full" style="background: transparent; border-color: white; color: white; margin: 0;" onclick="showScreen('achievements'); renderProfile();">📊 إنجازاتي</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Leaderboard Screen -->
+        <div id="screen-leaderboard" class="screen scrollable" style="align-items: center;">
+            <h1 class="text-4xl title-gold mt-10 mb-6">🏆 لوحة الأبطال</h1>
+            
+            <div style="background: rgba(15,23,42,0.9); border: 2px solid var(--royal-gold); border-radius: 20px; padding: 15px; width: 95%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <table class="data-table w-full">
+                    <thead>
+                        <tr>
+                            <th>الترتيب</th>
+                            <th>البطل</th>
+                            <th>النقاط</th>
+                            <th>👑 / ⭐</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <button class="btn-royal btn-blue mt-6" onclick="showScreen('start')">🏠 العودة للرئيسية</button>
+        </div>
+
+        <!-- 5. Profile/Achievements Screen -->
+        <div id="screen-achievements" class="screen scrollable" style="align-items: center;">
+            <h1 class="text-4xl title-gold mt-10 mb-2">📊 إنجازاتي</h1>
+            <h2 id="prof-name" class="text-2xl font-bold text-white mb-6">الاسم</h2>
+            
+            <div class="grid grid-cols-2 gap-4 max-w-lg w-full px-4">
+                <div class="bg-slate-800 p-4 rounded-xl text-center border-2 border-slate-600 shadow-md">
+                    <div class="text-3xl mb-1">🏆</div>
+                    <div class="font-bold text-gray-400 text-sm">أعلى نقاط</div>
+                    <div id="prof-best" class="text-2xl font-black text-yellow-400">0</div>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl text-center border-2 border-slate-600 shadow-md">
+                    <div class="text-3xl mb-1">👑</div>
+                    <div class="font-bold text-gray-400 text-sm">مرات الفوز</div>
+                    <div id="prof-wins" class="text-2xl font-black text-yellow-400">0</div>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl text-center border-2 border-slate-600 shadow-md">
+                    <div class="text-3xl mb-1">⭐</div>
+                    <div class="font-bold text-gray-400 text-sm">إجمالي النجوم</div>
+                    <div id="prof-stars" class="text-2xl font-black text-yellow-400">0</div>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl text-center border-2 border-slate-600 shadow-md">
+                    <div class="text-3xl mb-1">🎮</div>
+                    <div class="font-bold text-gray-400 text-sm">مرات اللعب</div>
+                    <div id="prof-games" class="text-2xl font-black text-yellow-400">0</div>
+                </div>
+            </div>
+
+            <button class="btn-royal btn-blue mt-8" onclick="showScreen('start')">🏠 العودة للرئيسية</button>
+            <button class="text-red-400 font-bold mt-6 underline" onclick="clearData()">🗑️ مسح بياناتي</button>
+        </div>
+
+    </div>
+
+<script>
+// --- Configuration & Constants ---
+// Bank of 50 robust questions. Readily expandable to 200 by adding to this array.
+const questionBank = [
+    // أكمل الآية
+    { q: 'أكمل: "الْحَمْدُ لِلَّهِ رَبِّ..."', options: ['الْعَالَمِينَ', 'السَّمَاوَاتِ', 'الْأَرْضِ', 'النَّاسِ'], a: 0 },
+    { q: 'أكمل: "إِذَا جَاءَ نَصْرُ اللَّهِ..."', options: ['وَالْفَتْحُ', 'وَالْفَجْرُ', 'وَالنُّورُ', 'وَالْعَصْرُ'], a: 0 },
+    { q: 'أكمل: "وَيْلٌ لِّلْمُطَفِّفِينَ * الَّذِينَ إِذَا اكْتَالُوا عَلَى النَّاسِ..."', options: ['يَسْتَوْفُونَ', 'يُخْسِرُونَ', 'يَمْكُرُونَ', 'يَغْفُلُونَ'], a: 0 },
+    { q: 'أكمل: "فَأَمَّا مَن ثَقُلَتْ مَوَازِينُهُ * فَهُوَ فِي عِيشَةٍ..."', options: ['رَّاضِيَةٍ', 'عَالِيَةٍ', 'بَاقِيَةٍ', 'دَائِمَةٍ'], a: 0 },
+    { q: 'أكمل: "وَأَرْسَلَ عَلَيْهِمْ طَيْرًا..."', options: ['أَبَابِيلَ', 'كَثِيرَةً', 'بَيْضَاءَ', 'جَارِحَةً'], a: 0 },
+    // اختر اسم السورة
+    { q: 'السورة التي تبدأ بـ "عَمَّ يَتَسَاءَلُونَ" هي:', options: ['النبأ', 'النازعات', 'عبس', 'التكوير'], a: 0 },
+    { q: 'السورة التي حذرت من الغيبة والنميمة "وَيْلٌ لِّكُلِّ هُمَزَةٍ لُّمَزَةٍ" هي:', options: ['الهمزة', 'الماعون', 'الكوثر', 'العصر'], a: 0 },
+    { q: 'سورة تسمى "سورة التوحيد" وتعدل ثلث القرآن:', options: ['الإخلاص', 'الفلق', 'الناس', 'الكافرون'], a: 0 },
+    { q: 'السورة التي تحدثت عن ليلة خير من ألف شهر:', options: ['القدر', 'الفجر', 'العلق', 'الضحى'], a: 0 },
+    // كم عدد آيات السورة
+    { q: 'كم عدد آيات سورة الكوثر (أقصر سورة في القرآن)؟', options: ['3 آيات', '4 آيات', '5 آيات', '6 آيات'], a: 0 },
+    { q: 'كم عدد آيات سورة الإخلاص؟', options: ['4 آيات', '3 آيات', '5 آيات', '6 آيات'], a: 0 },
+    // ما أول / آخر آية
+    { q: 'أول كلمة نزلت من القرآن الكريم هي:', options: ['اقْرَأْ', 'قُلْ', 'يَا أَيُّهَا', 'الْحَمْدُ'], a: 0 },
+    { q: 'آخر آية في سورة الناس هي:', options: ['مِنَ الْجِنَّةِ وَالنَّاسِ', 'مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ', 'إِلَهِ النَّاسِ', 'مَلِكِ النَّاسِ'], a: 0 },
+    // رتب كلمات الآية
+    { q: 'الترتيب الصحيح: (لَكُمْ / وَلِيَ / دِينِ / دِينُكُمْ)', options: ['لَكُمْ دِينُكُمْ وَلِيَ دِينِ', 'وَلِيَ دِينِ لَكُمْ دِينُكُمْ', 'دِينُكُمْ لَكُمْ وَلِيَ دِينِ', 'لَكُمْ وَلِيَ دِينِ دِينُكُمْ'], a: 0 },
+    // صح أم خطأ (مُصاغ كخيارات)
+    { q: 'سورة "الناس" من المعوذتين.', options: ['عبارة صحيحة', 'عبارة خاطئة', 'ليست سورة أصلاً', 'لا أعرف'], a: 0 },
+    { q: 'السورة التي نزلت في ذم أبو لهب وزوجته هي سورة المسد.', options: ['صح', 'خطأ', 'هي سورة الفيل', 'هي سورة قريش'], a: 0 },
+    // اختر الكلمة الصحيحة المعنى
+    { q: 'معنى كلمة "النَّفَّاثَاتِ" في سورة الفلق:', options: ['الساحرات اللاتي ينفخن في العقد', 'الرياح الشديدة', 'الحشرات السامة', 'النار الحارقة'], a: 0 },
+    { q: 'معنى "غَاسِقٍ إِذَا وَقَبَ":', options: ['الليل إذا أظلم', 'القمر إذا غاب', 'الشمس إذا أشرقت', 'المطر إذا نزل'], a: 0 },
+    { q: 'كلمة "سِجِّيلٍ" في سورة الفيل تعني:', options: ['طين مطبوخ كالحجر', 'نار', 'حديد', 'خشب'], a: 0 },
+    // التعرف على السورة من آية
+    { q: 'الآية "فَوَيْلٌ لِّلْمُصَلِّينَ * الَّذِينَ هُمْ عَن صَلَاتِهِمْ سَاهُونَ" في سورة:', options: ['الماعون', 'الهمزة', 'التكاثر', 'الكوثر'], a: 0 },
+    { q: 'الآية "وَأَمَّا السَّائِلَ فَلَا تَنْهَرْ" في سورة:', options: ['الضحى', 'الشرح', 'الليل', 'الفجر'], a: 0 },
+    // أسئلة أحكام تجويد بسيطة
+    { q: 'حرف النون المشدد في كلمة (إِنَّ) يُنطق بـ:', options: ['غنة مقدارها حركتان', 'قلقلة قوية', 'إخفاء', 'إدغام'], a: 0 },
+    { q: 'المد في كلمة (النَّاسِ) عند الوقف عليها يسمى مد:', options: ['عارض للسكون', 'طبيعي', 'متصل', 'منفصل'], a: 0 },
+    { q: 'حروف القلقلة مجموعة في كلمة:', options: ['قطب جد', 'يرملون', 'أخي هاك علما', 'ينمو'], a: 0 },
+    // المزيد من الأسئلة المتنوعة
+    { q: 'السورة التي تحدثت عن زلزلة الأرض يوم القيامة:', options: ['الزلزلة', 'القارعة', 'التكاثر', 'الغاشية'], a: 0 },
+    { q: 'أكمل: "إِنَّ مَعَ الْعُسْرِ..."', options: ['يُسْرًا', 'فَرَجًا', 'صَبْرًا', 'أَجْرًا'], a: 0 },
+    { q: 'السورة التي بدأت بالقسم بالتين والزيتون:', options: ['التين', 'البلد', 'الشمس', 'الليل'], a: 0 },
+    { q: 'أكمل: "لِإِيلَافِ قُرَيْشٍ * إِيلَافِهِمْ رِحْلَةَ..."', options: ['الشِّتَاءِ وَالصَّيْفِ', 'الرَّبِيعِ وَالْخَرِيفِ', 'التِّجَارَةِ وَالصَّيْدِ', 'الشَّامِ وَالْيَمَنِ'], a: 0 },
+    { q: 'السورة التي ذُكر فيها الجمل (الْإِبِلِ كَيْفَ خُلِقَتْ):', options: ['الغاشية', 'الطارق', 'الأعلى', 'الفجر'], a: 0 },
+    { q: 'أكمل: "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ * إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا..."', options: ['الصَّالِحَاتِ', 'الْخَيْرَاتِ', 'الطَّاعَاتِ', 'الْحَسَنَاتِ'], a: 0 }
+];
+
+// --- Game State Variables ---
+let currentUser = null;
+let currentQuestionIndex = 0; // 0 to 19
+let score = 0;
+let stars = 0;
+let correctAnswers = 0;
+let wrongAnswers = 0;
+let consecutiveCorrect = 0;
+let noMistakes = true; // For وسام الإتقان
+
+let timeSeconds = 30;
+let gameTimer = null;
+let isPlaying = false;
+let isPaused = false;
+
+let availableQuestions = [];
+let currentQuestionObj = null;
+
+// Lifelines state
+let lifelines = {
+    '5050': true,
+    'time': true,
+    'change': true,
+    'skip': true
+};
+
+// Audio Context setup
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+let isMuted = false;
+
+// --- Initialization & Flow ---
+window.onload = () => {
+    generateStars();
+    const lastUser = localStorage.getItem('tarteela_crown_lastUser');
+    if (lastUser) {
+        document.getElementById('player-name').value = lastUser;
+    }
+    
+    // Unlock Audio Context on first click
+    document.body.addEventListener('click', () => {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+    }, {once:true});
+};
+
+function generateStars() {
+    const bg = document.getElementById('stars-container');
+    for(let i=0; i<40; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.width = (Math.random() * 3 + 1) + 'px';
+        s.style.height = s.style.width;
+        s.style.animationDelay = (Math.random() * 3) + 's';
+        bg.appendChild(s);
+    }
+}
+
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(`screen-${screenId}`).classList.add('active');
+    
+    const homeBtn = document.getElementById('btn-home');
+    if (screenId === 'start') {
+        homeBtn.classList.add('hidden');
+    } else {
+        homeBtn.classList.remove('hidden');
+    }
+}
+
+// --- Data Management ---
+function loadProfile(name) {
+    let users = JSON.parse(localStorage.getItem('tarteela_crown_users')) || {};
+    if (users[name]) return users[name];
+    return {
+        name: name, bestScore: 0, gamesPlayed: 0, wins: 0,
+        maxLevel: 1, totalStars: 0, lastDate: new Date().toLocaleDateString()
+    };
+}
+
+function saveProfile() {
+    if (!currentUser) return;
+    currentUser.lastDate = new Date().toLocaleDateString();
+    let users = JSON.parse(localStorage.getItem('tarteela_crown_users')) || {};
+    users[currentUser.name] = currentUser;
+    localStorage.setItem('tarteela_crown_users', JSON.stringify(users));
+    localStorage.setItem('tarteela_crown_lastUser', currentUser.name);
+}
+
+function clearData() {
+    if(confirm('هل أنت متأكد من مسح جميع إنجازاتك؟')) {
+        let users = JSON.parse(localStorage.getItem('tarteela_crown_users')) || {};
+        if(currentUser && users[currentUser.name]) {
+            delete users[currentUser.name];
+            localStorage.setItem('tarteela_crown_users', JSON.stringify(users));
+        }
+        showScreen('start');
+        document.getElementById('player-name').value = '';
+    }
+}
+
+// --- Game Logic ---
+function startGame() {
+    const nameInput = document.getElementById('player-name').value.trim();
+    if (!nameInput) {
+        alert('أيها البطل، اكتب اسمك أولاً!');
+        return;
+    }
+
+    currentUser = loadProfile(nameInput);
+    
+    // Reset Game State
+    currentQuestionIndex = 0;
+    score = 0;
+    stars = 0;
+    correctAnswers = 0;
+    wrongAnswers = 0;
+    consecutiveCorrect = 0;
+    noMistakes = true;
+    isPlaying = true;
+    isPaused = false;
+    
+    // Reset Lifelines UI
+    lifelines = { '5050': true, 'time': true, 'change': true, 'skip': true };
+    document.querySelectorAll('.lifeline-btn').forEach(btn => btn.classList.remove('used'));
+    
+    // Shuffle Questions (need 20)
+    availableQuestions = [...questionBank].sort(() => 0.5 - Math.random());
+    
+    document.getElementById('hud-name').innerText = currentUser.name;
+    document.getElementById('win-crown').classList.remove('fall');
+    
+    updateHUD();
+    showScreen('game');
+    loadNextQuestion();
+}
+
+function loadNextQuestion() {
+    if (currentQuestionIndex >= 20) {
+        winGame();
+        return;
+    }
+
+    isPaused = false;
+    timeSeconds = 30; // 30 seconds per question
+    updateTimerDisplay();
+    
+    currentQuestionObj = availableQuestions.pop();
+    if (!currentQuestionObj) {
+        // Fallback if we run out of questions
+        availableQuestions = [...questionBank].sort(() => 0.5 - Math.random());
+        currentQuestionObj = availableQuestions.pop();
+    }
+    
+    // UI Updates
+    document.getElementById('q-current-num').innerText = currentQuestionIndex + 1;
+    document.getElementById('progress-bar').style.width = `${(currentQuestionIndex / 20) * 100}%`;
+    document.getElementById('hud-level').innerText = getLevelRank(currentQuestionIndex + 1);
+    
+    document.getElementById('q-text').innerText = currentQuestionObj.q;
+    const grid = document.getElementById('q-options');
+    grid.innerHTML = '';
+    
+    // Mix options
+    let opts = currentQuestionObj.options.map((opt, idx) => ({text: opt, isCorrect: idx === currentQuestionObj.a}));
+    opts.sort(() => 0.5 - Math.random());
+    
+    const letters = ['أ', 'ب', 'ج', 'د'];
+    opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.setAttribute('data-letter', letters[i]);
+        btn.innerText = o.text;
+        btn.onclick = () => submitAnswer(o.isCorrect, btn);
+        grid.appendChild(btn);
+    });
+    
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(gameTimer);
+    gameTimer = setInterval(() => {
+        if (!isPaused && isPlaying) {
+            timeSeconds--;
+            updateTimerDisplay();
+            if (timeSeconds <= 0) {
+                clearInterval(gameTimer);
+                timeOut();
+            }
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const t = document.getElementById('timer-display');
+    t.innerText = timeSeconds;
+    if (timeSeconds <= 5) t.classList.add('danger');
+    else t.classList.remove('danger');
+}
+
+function timeOut() {
+    isPaused = true;
+    wrongAnswers++;
+    consecutiveCorrect = 0;
+    noMistakes = false;
+    playSound('wrong');
+    
+    // Highlight correct answer
+    const buttons = document.querySelectorAll('.opt-btn');
+    buttons.forEach(b => {
+        b.classList.add('disabled');
+        // We find correct by checking if text matches original correct option
+        if (b.innerText === currentQuestionObj.options[currentQuestionObj.a]) {
+            b.classList.remove('disabled');
+            b.classList.add('correct');
+        }
+    });
+    
+    showFeedback("انتهى الوقت! ⏳", false);
+    
+    setTimeout(() => {
+        currentQuestionIndex++;
+        loadNextQuestion();
+    }, 2500);
+}
+
+function submitAnswer(isCorrect, btnElement) {
+    if (isPaused) return;
+    isPaused = true;
+    clearInterval(gameTimer);
+    
+    const buttons = document.querySelectorAll('.opt-btn');
+    buttons.forEach(b => b.classList.add('disabled'));
+    btnElement.classList.remove('disabled');
+
+    if (isCorrect) {
+        btnElement.classList.add('correct');
+        playSound('correct');
+        handleCorrect();
+    } else {
+        btnElement.classList.add('wrong');
+        playSound('wrong');
+        noMistakes = false;
+        
+        // Show correct one
+        buttons.forEach(b => {
+            if (b.innerText === currentQuestionObj.options[currentQuestionObj.a]) {
+                b.classList.remove('disabled');
+                b.classList.add('correct');
+            }
+        });
+        
+        handleWrong();
+    }
+}
+
+function handleCorrect() {
+    correctAnswers++;
+    consecutiveCorrect++;
+    let pts = 10;
+    score += pts;
+    
+    let msg = "إجابة صحيحة! ✅";
+    
+    if (consecutiveCorrect % 5 === 0) {
+        stars++;
+        score += 50; // Bonus
+        msg = "رائع! 5 متتالية (+50 نقطة ونجمة ⭐)";
+        playSound('star');
+    }
+    
+    updateHUD();
+    showFeedback(msg, true);
+    
+    setTimeout(() => {
+        currentQuestionIndex++;
+        loadNextQuestion();
+    }, 2000);
+}
+
+function handleWrong() {
+    wrongAnswers++;
+    consecutiveCorrect = 0;
+    
+    showFeedback("لا بأس، حاول في السؤال القادم ❌", false);
+    
+    setTimeout(() => {
+        currentQuestionIndex++;
+        loadNextQuestion();
+    }, 2500);
+}
+
+function showFeedback(text, isGood) {
+    const fb = document.getElementById('feedback-overlay');
+    fb.innerText = text;
+    fb.style.color = isGood ? '#166534' : '#7f1d1d';
+    fb.style.borderColor = isGood ? '#4ade80' : '#f87171';
+    fb.style.background = isGood ? '#dcfce7' : '#fee2e2';
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 1500);
+}
+
+function updateHUD() {
+    document.getElementById('hud-score').innerText = score;
+    document.getElementById('hud-stars').innerText = stars;
+}
+
+function getLevelRank(qNum) {
+    if (qNum <= 5) return "فارس القرآن 🥉";
+    if (qNum <= 10) return "حافظ مجتهد 🥈";
+    if (qNum <= 15) return "حافظ متميز 🥇";
+    if (qNum <= 19) return "نجم ترتيلا 🌟";
+    return "بطل التاج 👑";
+}
+
+// --- Lifelines ---
+function useLifeline(type) {
+    if (isPaused || !lifelines[type]) return;
+    
+    lifelines[type] = false;
+    document.getElementById(`ll-${type}`).classList.add('used');
+    playSound('click');
+    
+    if (type === '5050') {
+        const buttons = Array.from(document.querySelectorAll('.opt-btn'));
+        const wrongBtns = buttons.filter(b => b.innerText !== currentQuestionObj.options[currentQuestionObj.a]);
+        // Shuffle and hide 2
+        wrongBtns.sort(() => 0.5 - Math.random());
+        wrongBtns[0].style.visibility = 'hidden';
+        wrongBtns[1].style.visibility = 'hidden';
+    } 
+    else if (type === 'time') {
+        timeSeconds += 30;
+        updateTimerDisplay();
+        showFeedback("+30 ثانية ⏳", true);
+    }
+    else if (type === 'change') {
+        currentQuestionObj = availableQuestions.pop();
+        // Re-render
+        document.getElementById('q-text').innerText = currentQuestionObj.q;
+        const grid = document.getElementById('q-options');
+        grid.innerHTML = '';
+        let opts = currentQuestionObj.options.map((opt, idx) => ({text: opt, isCorrect: idx === currentQuestionObj.a}));
+        opts.sort(() => 0.5 - Math.random());
+        const letters = ['أ', 'ب', 'ج', 'د'];
+        opts.forEach((o, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.setAttribute('data-letter', letters[i]);
+            btn.innerText = o.text;
+            btn.onclick = () => submitAnswer(o.isCorrect, btn);
+            grid.appendChild(btn);
+        });
+        showFeedback("تم تغيير السؤال 🎁", true);
+    }
+    else if (type === 'skip') {
+        isPaused = true;
+        clearInterval(gameTimer);
+        showFeedback("تم تخطي السؤال بنجاح ⭐", true);
+        correctAnswers++; // Give credit
+        score += 10;
+        updateHUD();
+        setTimeout(() => {
+            currentQuestionIndex++;
+            loadNextQuestion();
+        }, 1500);
+    }
+}
+
+// --- End Game & Win ---
+function winGame() {
+    isPlaying = false;
+    clearInterval(gameTimer);
+    
+    // Completion bonus
+    score += 100;
+    
+    // Update Profile Stats
+    currentUser.gamesPlayed++;
+    currentUser.wins++;
+    currentUser.totalStars += stars;
+    if (score > currentUser.bestScore) currentUser.bestScore = score;
+    currentUser.maxLevel = 20; // Reached the end
+    
+    saveProfile();
+    
+    // Calculate Badge
+    let badgeIcon = '👑'; let badgeTitle = 'ملك التاج الذهبي';
+    if(noMistakes) { badgeTitle = 'ملك التاج + وسام الإتقان 💎'; }
+    else if(correctAnswers < 10) { badgeIcon = '🌱'; badgeTitle = 'مشارك متميز'; }
+    else if(correctAnswers < 15) { badgeIcon = '🌟'; badgeTitle = 'حافظ مجتهد'; }
+
+    // Populate Result Screen
+    document.getElementById('res-msg').innerText = `لقد أجبت عن الأسئلة بنجاح يا ${currentUser.name}!`;
+    document.getElementById('res-badge-icon').innerText = badgeIcon;
+    document.getElementById('res-badge-title').innerText = badgeTitle;
+    document.getElementById('res-score').innerText = score;
+    document.getElementById('res-stars').innerText = stars;
+    document.getElementById('res-correct').innerText = correctAnswers;
+    document.getElementById('res-wrong').innerText = wrongAnswers;
+    
+    const totalMins = Math.floor((30 * currentQuestionIndex - timeSeconds) / 60) || 0; // Rough estimate
+    document.getElementById('res-time').innerText = `~${totalMins + 1} دقيقة`;
+
+    showScreen('result');
+    playSound('win');
+    fireworks();
+    
+    setTimeout(() => {
+        document.getElementById('win-crown').classList.add('fall');
+    }, 500);
+}
+
+// --- Screens Data Loading ---
+function renderLeaderboard() {
+    const tbody = document.getElementById('leaderboard-body');
+    tbody.innerHTML = '';
+    
+    const users = JSON.parse(localStorage.getItem('tarteela_crown_users')) || {};
+    const sorted = Object.values(users).sort((a,b) => b.bestScore - a.bestScore).slice(0, 10);
+    
+    sorted.forEach((u, i) => {
+        let rank = i+1;
+        if(i===0) rank = '🥇'; else if(i===1) rank = '🥈'; else if(i===2) rank = '🥉';
+        
+        tbody.innerHTML += `
+            <tr>
+                <td class="font-bold text-xl">${rank}</td>
+                <td>${u.name}</td>
+                <td class="text-yellow-400 font-bold">${u.bestScore}</td>
+                <td>${u.maxLevel} / ${u.totalStars}</td>
+            </tr>
+        `;
+    });
+}
+
+function renderProfile() {
+    if(!currentUser) {
+        showScreen('start');
+        return;
+    }
+    document.getElementById('prof-name').innerText = currentUser.name;
+    document.getElementById('prof-best').innerText = currentUser.bestScore;
+    document.getElementById('prof-wins').innerText = currentUser.wins;
+    document.getElementById('prof-stars').innerText = currentUser.totalStars;
+    document.getElementById('prof-games').innerText = currentUser.gamesPlayed;
+}
+
+// --- Visual & Audio Effects ---
+function fireworks() {
+    const cont = document.getElementById('screen-result');
+    for(let i=0; i<50; i++) {
+        setTimeout(() => {
+            const f = document.createElement('div');
+            f.className = 'confetti text-3xl';
+            f.innerText = ['👑','⭐','✨','🎉'][Math.floor(Math.random()*4)];
+            f.style.left = '50%'; f.style.top = '50%';
+            f.style.transform = `translate(-50%, -50%) rotate(${Math.random()*360}deg)`;
+            f.style.transition = 'all 1.5s cubic-bezier(0.1, 0.8, 0.3, 1)';
+            cont.appendChild(f);
+            
+            setTimeout(() => {
+                const tx = (Math.random()-0.5)*window.innerWidth;
+                const ty = (Math.random()-0.5)*window.innerHeight;
+                f.style.transform = `translate(${tx}px, ${ty}px) rotate(${Math.random()*720}deg) scale(1.5)`;
+                f.style.opacity = 0;
+            }, 10);
+            
+            setTimeout(() => f.remove(), 1600);
+        }, i * 40);
+    }
+}
+
+function toggleSound() {
+    isMuted = !isMuted;
+    document.getElementById('btn-sound').innerText = isMuted ? '🔇' : '🔊';
+}
+
+function playSound(type) {
+    if (isMuted || audioCtx.state === 'suspended') return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    
+    if (type === 'click') {
+        osc.type = 'sine'; osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+        gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now); osc.stop(now + 0.1);
+    } else if (type === 'correct') {
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.1);
+        gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.4);
+        osc.start(now); osc.stop(now + 0.4);
+    } else if (type === 'wrong') {
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(80, now + 0.4);
+        gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        osc.start(now); osc.stop(now + 0.4);
+    } else if (type === 'star') {
+        osc.type = 'square'; osc.frequency.setValueAtTime(523.25, now); osc.frequency.setValueAtTime(783.99, now + 0.15);
+        gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.4);
+        osc.start(now); osc.stop(now + 0.4);
+    } else if (type === 'win') {
+        osc.type = 'sine';
+        [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.type = 'triangle'; o.frequency.value = freq;
+            o.connect(g); g.connect(audioCtx.destination);
+            g.gain.setValueAtTime(0.1, now + (i*0.2)); g.gain.exponentialRampToValueAtTime(0.01, now + (i*0.2) + 0.6);
+            o.start(now + (i*0.2)); o.stop(now + (i*0.2) + 0.6);
+        });
+    }
+}
+</script>
+</body>
+</html>
